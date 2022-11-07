@@ -1,7 +1,8 @@
-cmake_minimum_required (VERSION 2.8.11)
+cmake_minimum_required (VERSION 3.3)
 project (pleaseDontOverlap)
 
-# Recurse into the "Hello" and "Demo" subdirectories. This does not actually
-# cause another cmake executable to run. The same process will walk through
-# the project's entire directory structure.
+include_directories(deps/)
+include_directories(deps/imgui)
+
 add_subdirectory (src)
+add_subdirectory (test)

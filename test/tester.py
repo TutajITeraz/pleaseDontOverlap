@@ -7,9 +7,39 @@ x1 = np.random.random(100)
 x2 = np.random.random(100)
 label = np.random.randint(0, 4, 100)
 
-#importing our
+#importing our c++ implementation of the function
 from ctypes import *
+libc = CDLL("libc.so.6") 
 LabelFilter = cdll.LoadLibrary("build/src/libLabelFilter.so") 
+
+#my_label_filter = LabelFilter.CreateInstanceOfLabelFilter()
+
+class POINT(Structure):
+    _fields_ = [("x", c_double),
+                ("y", c_double)]
+
+class SIZE(Structure):
+    _fields_ = [("w", c_double),
+                ("h", c_double)]
+
+class COORDINATES(Structure):
+    _fields_ = [("lon", c_double),
+                ("lat", c_double)]
+
+class LABEL(Structure):
+    _fields_ = [("name", c_char_p),
+                ("position", COORDINATES),
+                ("pivot", POINT),
+                ("size", SIZE),
+                ("priority", c_double),
+                ]
+
+point = POINT(9,10)
+
+label = LABEL("test", COORDINATES(1,2), POINT(3,4), SIZE(5,6), 1.5)
+
+#CallLabelFilterSetList(my_label_filter)
+
 print(LabelFilter)
 
 def generate_labels():
