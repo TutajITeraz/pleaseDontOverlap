@@ -1,158 +1,248 @@
-// Dear ImGui: standalone example application for GLUT/FreeGLUT + OpenGL2, using legacy fixed pipeline
-// If you are new to Dear ImGui, read documentation from the docs/ folder + read the top of imgui.cpp.
-// Read online: https://github.com/ocornut/imgui/tree/master/docs
+#include <stdio.h>
+#include <opencv2/opencv.hpp>
 
-// !!! GLUT/FreeGLUT IS OBSOLETE PREHISTORIC SOFTWARE. Using GLUT is not recommended unless you really miss the 90's. !!!
-// !!! If someone or something is teaching you GLUT today, you are being abused. Please show some resistance. !!!
-// !!! Nowadays, prefer using GLFW or SDL instead!
+#include <Coordinates.hpp>
+#include <Size.hpp>
+#include <Point.hpp>
+#include <Label.hpp>
+#include <LabelGroup.hpp>
+#include <LabelGroupList.hpp>
+#include <LabelFilter.hpp>
+#include <random>
 
-// On Windows, you can install Freeglut using vcpkg:
-//   git clone https://github.com/Microsoft/vcpkg
-//   cd vcpkg
-//   bootstrap - vcpkg.bat
-//   vcpkg install freeglut --triplet=x86-windows   ; for win32
-//   vcpkg install freeglut --triplet=x64-windows   ; for win64
-//   vcpkg integrate install                        ; register include and libs in Visual Studio
+const int HOW_MANY_LISTS = 3;
+const int HOW_MANY_LABELS = 30;
 
-#include "imgui.h"
-#include "imgui_impl_glut.h"
-#include "imgui_impl_opengl2.h"
-#define GL_SILENCE_DEPRECATION
-#ifdef __APPLE__
-    #include <GLUT/glut.h>
-#else
-    #include <GL/freeglut.h>
-#endif
+const int WINDOW_W = 800;
+const int WINDOW_H = 600;
 
-#ifdef _MSC_VER
-#pragma warning (disable: 4505) // unreferenced local function has been removed
-#endif
+double SCALE = 1.0;
+double PADDING_X = 1.0;
+double PADDING_Y = 1.0;
 
-// Our state
-static bool show_demo_window = true;
-static bool show_another_window = false;
-static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+cv::Mat SCREEN_MAT;
+cv::Mat BG_IMAGE;
 
-void my_display_code()
+LabelGroupList LIST;
+
+double fRand(double fMin, double fMax)
 {
-    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-    if (show_demo_window)
-        ImGui::ShowDemoWindow(&show_demo_window);
+    thread_local static std::random_device rd;
 
-    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+    thread_local static std::mt19937 gen(rd());
+
+    std::uniform_real_distribution<double> dis(fMin,fMax);
+    std::default_random_engine re;
+    return dis(gen);
+}
+
+LabelGroupList generateRadnomLists(Size min_label_size, Size max_label_size)
+{
+    LabelGroupList list;
+
+    for(int l=0; l<HOW_MANY_LISTS; l++)
     {
-        static float f = 0.0f;
-        static int counter = 0;
+        LabelGroup group;
 
-        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+        for(int g=0; g<HOW_MANY_LABELS; g++)
+        {
+            double pos_x = fRand(0,WINDOW_W);
+            double pos_y = fRand(0,WINDOW_H);
+            double w = fRand(min_label_size.w,max_label_size.w);
+            double h = fRand(min_label_size.h,max_label_size.h);
+            double priority = floor(fRand(0.1,10.0));
 
-        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        ImGui::Checkbox("Another Window", &show_another_window);
+            Label label;
+            label.name = "label";
+            label.position = Coordinates{pos_x, pos_y};
+            label.size = Size{w,h};
+            label.priority = priority;
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+            group.push_back(label);
+        }
 
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-            counter++;
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
-
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::End();
+        list.push_back(group);
     }
 
-    // 3. Show another simple window.
-    if (show_another_window)
-    {
-        ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-        ImGui::Text("Hello from another window!");
-        if (ImGui::Button("Close Me"))
-            show_another_window = false;
-        ImGui::End();
+    return list;
+}
+
+
+void calculateScreenPixels(LabelGroupList &list, double scale)
+{
+    int list_i=0;
+    for (LabelGroupList::iterator lit = list.begin(); lit != list.end(); ++lit){
+
+        for(LabelGroup::iterator git = lit->begin(); git != lit->end(); ++git){
+            Label &label = (*git);
+
+            label.pivot.x = floor(label.position.lon * scale) + PADDING_X;
+            label.pivot.y = floor(label.position.lat * scale) + PADDING_Y;
+        }
+        //std::cout<<std::endl;
     }
 }
 
-void glut_display_func()
+void printList(LabelGroupList &list)
 {
-    // Start the Dear ImGui frame
-    ImGui_ImplOpenGL2_NewFrame();
-    ImGui_ImplGLUT_NewFrame();
+    int list_i=0;
+    for (LabelGroupList::iterator lit = list.begin(); lit != list.end(); ++lit){
+        std::cout<<"List "<<list_i++<<std::endl;
 
-    my_display_code();
+        for(LabelGroup::iterator git = lit->begin(); git != lit->end(); ++git){
+            Label &label = (*git);
 
-    // Rendering
-    ImGui::Render();
-    ImGuiIO& io = ImGui::GetIO();
-    glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
-    glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
-    //glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context where shaders may be bound, but prefer using the GL3+ code.
-    ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
-
-    glutSwapBuffers();
-    glutPostRedisplay();
+            std::cout<<label.name<<'\t'<<label.position.lon<<'\t'<<label.position.lat<<'\t'<<label.pivot.x<<'\t'<<label.pivot.y<<'\t'<<label.size.w<<'\t'<<label.size.h<<'\t'<<label.priority<<'\t'<<std::endl;
+        }
+        std::cout<<std::endl;
+    }
 }
 
-// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 
-int main(int argc, char** argv)
+void displayList(LabelGroupList &list)
 {
-    // Create GLUT window
-    glutInit(&argc, argv);
-#ifdef __FREEGLUT_EXT_H__
-    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
-#endif
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_MULTISAMPLE);
-    glutInitWindowSize(1280, 720);
-    glutCreateWindow("Dear ImGui GLUT+OpenGL2 Example");
+    int list_i=0;
+    for (LabelGroupList::iterator lit = list.begin(); lit != list.end(); ++lit){
+        //std::cout<<"List "<<list_i++<<std::endl;
 
-    // Setup GLUT display function
-    // We will also call ImGui_ImplGLUT_InstallFuncs() to get all the other functions installed for us,
-    // otherwise it is possible to install our own functions and call the imgui_impl_glut.h functions ourselves.
-    glutDisplayFunc(glut_display_func);
+        for(LabelGroup::iterator git = lit->begin(); git != lit->end(); ++git){
+            Label &label = (*git);
 
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+            //1. Draw rectangle
+            int x = label.pivot.x;
+            int y = label.pivot.y;
+            int width = label.size.w;
+            int height = label.size.h;
+            cv::Scalar color = CV_RGB(0, 0, 0);
 
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsLight();
+            cv::Rect rect(x, y+12, width, height);
+            cv::rectangle(SCREEN_MAT, rect, color);
 
-    // Setup Platform/Renderer backends
-    // FIXME: Consider reworking this example to install our own GLUT funcs + forward calls ImGui_ImplGLUT_XXX ones, instead of using ImGui_ImplGLUT_InstallFuncs().
-    ImGui_ImplGLUT_Init();
-    ImGui_ImplGLUT_InstallFuncs();
-    ImGui_ImplOpenGL2_Init();
+            //2. Draw priority
+            std::stringstream label_ss;
+            label_ss << label.priority;
 
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-    // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-    // - Read 'docs/FONTS.md' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-    //IM_ASSERT(font != NULL);
+            cv::putText(SCREEN_MAT, //target image
+            label_ss.str(), //text
+            cv::Point(x,y+26), //top-left position. 24 is font h
+            cv::FONT_HERSHEY_COMPLEX_SMALL,
+            1.0,
+            color, //font color
+            2);//2 makes bold
+            
+        }
+        //std::cout<<std::endl;
+    }
 
-    glutMainLoop();
+}
 
-    // Cleanup
-    ImGui_ImplOpenGL2_Shutdown();
-    ImGui_ImplGLUT_Shutdown();
-    ImGui::DestroyContext();
+void refreshDisplay(){
+    cv::resize(BG_IMAGE, SCREEN_MAT, cv::Size(WINDOW_W, WINDOW_H));
+    calculateScreenPixels(LIST, SCALE);
+    //printList(LIST);
+    displayList(LIST);
+    //cv::pyrUp(BG_IMAGE, SCREEN_MAT, cv::Size(WINDOW_W * SCALE, WINDOW_H * SCALE));
+    cv::imshow("Label filter terster", SCREEN_MAT);
+}
 
+
+void on_mouse(int event, int x, int y, int flags, void* userdata)
+{
+    static int position_from_x = -1;
+    static int position_from_y = -1;
+    //mouse position for zoomming:
+    static double mx;
+    static double my;
+
+    //printf("event = %d, %d\n", event, cv::getMouseWheelDelta(flags));
+
+    if (event==cv::EVENT_MOUSEWHEEL){
+        std::cout<<"mx = "<<mx<<std::endl;
+        std::cout<<"my = "<<my<<std::endl;
+        std::cout<<"x = "<<x<<std::endl;
+        std::cout<<"y = "<<y<<std::endl;
+        if(cv::getMouseWheelDelta(flags)>0)//Zoom in
+        {
+            SCALE += 0.1;
+            PADDING_X -= 0.1*x;
+            PADDING_Y -= 0.1*y;
+        }
+        else{//zoom out
+            if(SCALE >0.5)
+            {
+                SCALE -= 0.1;
+
+                PADDING_X += 0.1*x;
+                PADDING_Y += 0.1*y;
+            }
+        }
+
+        std::cout<<SCALE<<std::endl;
+
+        refreshDisplay();
+    }
+    else if ( event == cv::EVENT_LBUTTONDOWN) // 
+    {
+        position_from_x = x;
+        position_from_y = y;
+    }
+    else if ( event == cv::EVENT_LBUTTONUP) // 
+    {
+        /*
+        PADDING_X += x - position_from_x;
+        PADDING_Y += y - position_from_y;
+
+        std::cout<<"PADDING_X"<<PADDING_X<<std::endl;
+        std::cout<<"PADDING_Y"<<PADDING_Y<<std::endl;
+
+        position_from_x = -1;
+        position_from_y = -1;*/
+        refreshDisplay();
+    }
+    else // mouse move (pressed)
+    {
+        PADDING_X += x - position_from_x;
+        PADDING_Y += y - position_from_y;
+
+        refreshDisplay();
+
+        position_from_x = x;
+        position_from_y = y;
+    }
+
+    
+}
+
+int main(int argc, char** argv )
+{
+    if ( argc != 2 )
+    {
+        printf("usage: DisplayImage.out <Image_Path>\n");
+        return -1;
+    }
+
+    BG_IMAGE = cv::imread( argv[1], 1 );
+    if ( !BG_IMAGE.data )
+    {
+        printf("No bg_image data \n");
+        return -1;
+    }
+    cv::namedWindow("Label filter terster", cv::WINDOW_OPENGL  /* |  cv::WINDOW_GUI_NORMAL */ );//WINDOW_AUTOSIZE
+
+
+    refreshDisplay();
+
+    cv::resizeWindow("Label filter terster", WINDOW_W, WINDOW_H );
+    //cv::setWindowProperty"Label filter terster", prop_id, prop_value	);
+
+
+    //Creating random list:
+    LIST = generateRadnomLists(Size{24,16}, Size{120,34});
+    refreshDisplay();
+
+    cv::setMouseCallback( "Label filter terster", on_mouse, NULL );
+
+
+    cv::waitKey(0);
     return 0;
 }

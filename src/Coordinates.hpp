@@ -3,7 +3,7 @@
 #define COORDINATES_HPP
 
 struct Coordinates {
-    double lat, lon;    //latitude, longitude
+    double lon, lat;    //latitude, longitude
 };
 
 #endif // COORDINATES_HPP
