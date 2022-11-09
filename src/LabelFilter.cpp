@@ -13,7 +13,6 @@
 #include <new> //For std::nothrow
 #include <algorithm> //For std::sort
 
-
 /**
  * Function checks if two label colides with each other
  *
@@ -38,7 +37,6 @@ inline bool LabelFilter::checkLabelsCollision(const Label &l1,const Label &l2)
  *
  * @return all the labels that should be visible in a one combined group
  */
-
 LabelGroup LabelFilter::getFilteredLabels()
 {
     //Step 1. We are creating new group (allLabels) that will contain all the labels from all the datasets:
