@@ -18,6 +18,8 @@ const int WINDOW_H = 600;
 
 double SCALE = 1.0;
 const double MIN_SCALE = 0.2;
+const double SCALE_STEP = 0.02;
+
 double PADDING_X = 1.0;
 double PADDING_Y = 1.0;
 
@@ -195,17 +197,17 @@ void on_mouse(int event, int x, int y, int flags, void* userdata)
         std::cout<<"y = "<<y<<std::endl;
         if(cv::getMouseWheelDelta(flags)>0)//Zoom in
         {
-            SCALE += 0.1;
-            PADDING_X -= 0.1*x;
-            PADDING_Y -= 0.1*y;
+            SCALE += SCALE_STEP;
+            PADDING_X -= SCALE_STEP*x;
+            PADDING_Y -= SCALE_STEP*y;
         }
         else{//zoom out
             if(SCALE >MIN_SCALE)
             {
-                SCALE -= 0.1;
+                SCALE -= SCALE_STEP;
 
-                PADDING_X += 0.1*x;
-                PADDING_Y += 0.1*y;
+                PADDING_X += SCALE_STEP*x;
+                PADDING_Y += SCALE_STEP*y;
             }
         }
 
