@@ -17,6 +17,7 @@ const int WINDOW_W = 800;
 const int WINDOW_H = 600;
 
 double SCALE = 1.0;
+const double MIN_SCALE = 0.2;
 double PADDING_X = 1.0;
 double PADDING_Y = 1.0;
 
@@ -113,7 +114,7 @@ void displayList(LabelGroupList &list)
             int y = label.pivot.y;
             int width = label.size.w;
             int height = label.size.h;
-            cv::Scalar color = CV_RGB(0, 0, 0);
+            cv::Scalar color = CV_RGB(200, 200, 200);
 
             cv::Rect rect(x, y+12, width, height);
             cv::rectangle(SCREEN_MAT, rect, color);
@@ -132,6 +133,37 @@ void displayList(LabelGroupList &list)
             
         }
         //std::cout<<std::endl;
+    }
+
+    //Drawing selected labels:
+    LabelFilter newLabelFilter(list);
+    LabelGroup selectedLabels = newLabelFilter.getFilteredLabels();
+
+    for(LabelGroup::iterator git = selectedLabels.begin(); git != selectedLabels.end(); ++git){
+        Label &label = (*git);
+
+        //1. Draw rectangle
+        int x = label.pivot.x;
+        int y = label.pivot.y;
+        int width = label.size.w;
+        int height = label.size.h;
+        cv::Scalar color = CV_RGB(0, 0, 0);
+
+        cv::Rect rect(x, y+12, width, height);
+        cv::rectangle(SCREEN_MAT, rect, color);
+
+        //2. Draw priority
+        std::stringstream label_ss;
+        label_ss << label.priority;
+
+        cv::putText(SCREEN_MAT, //target image
+        label_ss.str(), //text
+        cv::Point(x,y+26), //top-left position. 24 is font h
+        cv::FONT_HERSHEY_COMPLEX_SMALL,
+        1.0,
+        color, //font color
+        2);//2 makes bold
+        
     }
 
 }
@@ -168,7 +200,7 @@ void on_mouse(int event, int x, int y, int flags, void* userdata)
             PADDING_Y -= 0.1*y;
         }
         else{//zoom out
-            if(SCALE >0.5)
+            if(SCALE >MIN_SCALE)
             {
                 SCALE -= 0.1;
 

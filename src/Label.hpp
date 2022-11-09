@@ -13,6 +13,21 @@ struct Label {
     Point           pivot;      //pivot point in screen pixels
     Size            size;       //size in screen pixels
     double          priority;   //display priority
+
+    Label(){}
+    Label(const std::string& n, const Coordinates &pos, const Point &piv, const Size &s, double pri ) 
+        :       name(n),              position(pos),          pivot(piv),       size(s), priority(pri) {}
+
+    bool operator < (const Label& otherLabel) const
+    {
+        return (priority < otherLabel.priority);
+    }
+
+    bool operator > (const Label& otherLabel) const
+    {
+        return (priority > otherLabel.priority);
+    }
+
 };
 
 #endif // LABEL_HPP
