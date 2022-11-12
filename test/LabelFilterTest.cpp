@@ -139,7 +139,7 @@ void displayList(LabelGroupList &list)
 
     //Drawing selected labels:
     LabelFilter newLabelFilter(list);
-    LabelGroup selectedLabels = newLabelFilter.getFilteredLabels();
+    LabelGroup selectedLabels = newLabelFilter.getFilteredLabels(stable);
 
     for(LabelGroup::iterator git = selectedLabels.begin(); git != selectedLabels.end(); ++git){
         Label &label = (*git);

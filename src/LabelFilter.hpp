@@ -17,12 +17,14 @@ class LabelFilter{
 
         void                setList(const LabelGroupList newList);
         LabelGroupList      getList();
-        LabelGroup          getFilteredLabels();
+        LabelGroup          getFilteredLabels(FilteringAlgorithm algorithm=stable);
 
     private:
         LabelGroupList      list;
 
         bool                checkLabelsCollision(const Label &l1,const Label &l2);
+        LabelGroup          getFilteredLabelsStable();
+        LabelGroup          getFilteredLabelsShowMore();
 };
 
 

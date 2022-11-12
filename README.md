@@ -2,10 +2,42 @@
 # LabelFilter
 
 Basic implementation of map/chart decluttering labels algorithm.
-It will determine which labels should be shown on the screen, and wchich should not, depending on the labels position, collisions and priority.
+It will determine which labels should be shown on the screen, and wchich should not, depending on the labels position, collisions and priority. Labels on the left are prefered.
+
+There are two algorithms provided. "stable" and "showMore".
+
+## Algorithms:
+
+# Stable algorithm
+
+Pros:
+    - When label is displayed from far away - it will always be shown on close up
+Cons:
+    - Slightly slower
+    - Less labels are displayed (due to collision propagation - look at the end of this document)
+
+
+Visualization:
+
+![Visualization of the algorithm](img/sneak_peak_visualization_stable.gif "Visualization of stable algorithm")
+
+
+# showMore algorithm
+
+Pros:
+    - Slightly faster
+    - No collision propagation - more labels are shown
+Cons:
+    - labels may show and dissapear at different level
+
+
+
+Visualization:
+
+![Visualization of the algorithm](img/sneak_peak_visualization.gif "Visualization of showMore algorithm")
 
 ## Visualization:
-![Visualization of the algorithm](img/sneak_peak_visualization.gif "Visualization 1")
+![Visualization of the algorithm](img/sneak_peak_visualization_stable.gif "Visualization of stable algorithm")
 
 # Compilation
 
