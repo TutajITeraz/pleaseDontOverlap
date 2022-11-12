@@ -8,7 +8,7 @@ There are two algorithms provided. "stable" and "showMore".
 
 ## Algorithms:
 
-# Stable algorithm
+### Stable algorithm
 
 Pros:
     - When label is displayed from far away - it will always be shown on close up
@@ -22,7 +22,7 @@ Visualization:
 ![Visualization of the algorithm](img/sneak_peak_visualization_stable.gif "Visualization of stable algorithm")
 
 
-# showMore algorithm
+### showMore algorithm
 
 Pros:
     - Slightly faster
@@ -36,8 +36,6 @@ Visualization:
 
 ![Visualization of the algorithm](img/sneak_peak_visualization.gif "Visualization of showMore algorithm")
 
-## Visualization:
-![Visualization of the algorithm](img/sneak_peak_visualization_stable.gif "Visualization of stable algorithm")
 
 # Compilation
 
