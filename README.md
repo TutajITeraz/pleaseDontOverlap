@@ -12,6 +12,7 @@ There are two algorithms provided. "stable" and "showMore".
 
 Pros:
  - When label is displayed from far away - it will always be shown on close up
+ 
 Cons:
  - Slightly slower
  - Less labels are displayed (due to collision propagation - look at the end of this document)
@@ -27,6 +28,7 @@ Visualization:
 Pros:
  - Slightly faster
  - No collision propagation - more labels are shown
+
 Cons:
  - labels may show and dissapear at different level
 
