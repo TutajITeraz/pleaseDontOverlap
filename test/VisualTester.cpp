@@ -1,3 +1,11 @@
+/*
+ * VisualTester
+ * Used in both the Visual and Console Tester.
+ *
+ * Copyright (C) 2022 Łukasz Bolda < http://rebold.pl/ >
+ * This code is licensed under MIT license (see LICENSE.txt for details)
+ */
+
 #include <stdio.h>
 #include <opencv2/opencv.hpp>
 
@@ -8,68 +16,21 @@
 #include <LabelGroup.hpp>
 #include <LabelGroupList.hpp>
 #include <LabelFilter.hpp>
-#include <random>
+#include <CommonTestFunctions.hpp>
 
-const int HOW_MANY_LISTS = 3;
-const int HOW_MANY_LABELS = 30;
-
-const int WINDOW_W = 800;
-const int WINDOW_H = 600;
 
 double SCALE = 1.0;
 const double MIN_SCALE = 0.2;
 const double SCALE_STEP = 0.02;
-
 double PADDING_X = 1.0;
 double PADDING_Y = 1.0;
+extern int HOW_MANY_LISTS;
+extern int HOW_MANY_LABELS;
 
 cv::Mat SCREEN_MAT;
 cv::Mat BG_IMAGE;
 
 LabelGroupList LIST;
-
-double fRand(double fMin, double fMax)
-{
-    thread_local static std::random_device rd;
-
-    thread_local static std::mt19937 gen(rd());
-
-    std::uniform_real_distribution<double> dis(fMin,fMax);
-    std::default_random_engine re;
-    return dis(gen);
-}
-
-LabelGroupList generateRadnomLists(Size min_label_size, Size max_label_size)
-{
-    LabelGroupList list;
-
-    for(int l=0; l<HOW_MANY_LISTS; l++)
-    {
-        LabelGroup group;
-
-        for(int g=0; g<HOW_MANY_LABELS; g++)
-        {
-            double pos_x = fRand(0,WINDOW_W);
-            double pos_y = fRand(0,WINDOW_H);
-            double w = fRand(min_label_size.w,max_label_size.w);
-            double h = fRand(min_label_size.h,max_label_size.h);
-            double priority = floor(fRand(0.1,10.0));
-
-            Label label;
-            label.name = "label";
-            label.position = Coordinates{pos_x, pos_y};
-            label.size = Size{w,h};
-            label.priority = priority;
-
-            group.push_back(label);
-        }
-
-        list.push_back(group);
-    }
-
-    return list;
-}
-
 
 void calculateScreenPixels(LabelGroupList &list, double scale)
 {
@@ -85,22 +46,6 @@ void calculateScreenPixels(LabelGroupList &list, double scale)
         //std::cout<<std::endl;
     }
 }
-
-void printList(LabelGroupList &list)
-{
-    int list_i=0;
-    for (LabelGroupList::iterator lit = list.begin(); lit != list.end(); ++lit){
-        std::cout<<"List "<<list_i++<<std::endl;
-
-        for(LabelGroup::iterator git = lit->begin(); git != lit->end(); ++git){
-            Label &label = (*git);
-
-            std::cout<<label.name<<'\t'<<label.position.lon<<'\t'<<label.position.lat<<'\t'<<label.pivot.x<<'\t'<<label.pivot.y<<'\t'<<label.size.w<<'\t'<<label.size.h<<'\t'<<label.priority<<'\t'<<std::endl;
-        }
-        std::cout<<std::endl;
-    }
-}
-
 
 void displayList(LabelGroupList &list)
 {
@@ -191,10 +136,12 @@ void on_mouse(int event, int x, int y, int flags, void* userdata)
     //printf("event = %d, %d\n", event, cv::getMouseWheelDelta(flags));
 
     if (event==cv::EVENT_MOUSEWHEEL){
+        /*
         std::cout<<"mx = "<<mx<<std::endl;
         std::cout<<"my = "<<my<<std::endl;
         std::cout<<"x = "<<x<<std::endl;
         std::cout<<"y = "<<y<<std::endl;
+        */
         if(cv::getMouseWheelDelta(flags)>0)//Zoom in
         {
             SCALE += SCALE_STEP;
@@ -249,19 +196,14 @@ void on_mouse(int event, int x, int y, int flags, void* userdata)
 
 int main(int argc, char** argv )
 {
-    if ( argc != 2 )
-    {
-        printf("usage: DisplayImage.out <Image_Path>\n");
-        return -1;
-    }
-
-    BG_IMAGE = cv::imread( argv[1], 1 );
+    //generating background    
+    BG_IMAGE = cv::imread( "../test/img/map.png", 1 );
     if ( !BG_IMAGE.data )
     {
-        printf("No bg_image data \n");
-        return -1;
+        BG_IMAGE = cv::Mat(WINDOW_W,WINDOW_H,CV_8UC3, cv::Scalar(255, 210, 195));
     }
-    cv::namedWindow("Label filter terster", cv::WINDOW_OPENGL  /* |  cv::WINDOW_GUI_NORMAL */ );//WINDOW_AUTOSIZE
+    
+    cv::namedWindow("Label filter terster", cv::WINDOW_OPENGL );// other options: WINDOW_AUTOSIZE |  cv::WINDOW_GUI_NORMAL 
 
 
     refreshDisplay();

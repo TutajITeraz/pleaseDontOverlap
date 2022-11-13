@@ -14,7 +14,7 @@ Pros:
  - When label is displayed from far away - it will always be shown on close up
  
 Cons:
- - Slightly slower
+ - Slightly slower ( 4ms for 1000 labels, 0.25ms for 100 labels )
  - Less labels are displayed (due to collision propagation - look at the end of this document)
 
 
@@ -26,7 +26,7 @@ Visualization:
 ### showMore algorithm
 
 Pros:
- - Slightly faster
+ - Slightly faster (1.6ms for 1000 labels, 0.12ms for 100 labels )
  - No collision propagation - more labels are shown
 
 Cons:
@@ -76,5 +76,6 @@ pamac install opencv
 ![Positioning labels example](img/positioning_labels3.jpg?raw=true "Example 3")
 ![Positioning labels example](img/positioning_labels4.jpg?raw=true "Example 4")
 
+ - For larger datasets Spartial Hashmap should be considered
 
 Author: Łukasz Bolda

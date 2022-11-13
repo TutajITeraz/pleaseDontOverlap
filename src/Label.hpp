@@ -1,12 +1,11 @@
 /*
- * LabelFilter - main class of the libLabelFilter
- * Basic implementation of map/chart decluttering labels algorithm.
- * It will determine which labels should be shown on the screen,
- * and which should not, depending on the labels position, collisions and priority.
+ * Label is a simple text object with un-transformed and tranfsformed position
+ * display priority, and size.
  *
  * Copyright (C) 2022 Łukasz Bolda < http://rebold.pl/ >
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
+
  
 #pragma once
 #ifndef LABEL_HPP
