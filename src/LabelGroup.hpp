@@ -12,6 +12,19 @@
 #include <Label.hpp>
 #include <vector>
 
+namespace pl
+{
+namespace rebold
+{
+namespace labelFilter
+{
+
+
 typedef std::vector<Label> LabelGroup;
+
+
+}//namespace labelFilter
+}//namespace rebold
+}//namespace pl
 
 #endif // LABEL_GROUP_HPP

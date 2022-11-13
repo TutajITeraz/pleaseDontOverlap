@@ -13,6 +13,13 @@
 #include <new> //For std::nothrow
 #include <algorithm> //For std::sort
 
+namespace pl
+{
+namespace rebold
+{
+namespace labelFilter
+{
+
 /**
  * Function checks if two label colides with each other
  *
@@ -33,9 +40,8 @@ inline bool LabelFilter::checkLabelsCollision(const Label &l1,const Label &l2)
 
 
 /**
- * Function filters the list and returns one filtered out LabelGroup
+ * LabelGroup function filters the list and returns one filtered out LabelGroup
  *
-
  * @param algorithm selects algoritm. It can be "stable" or "showMore".
  * @return all the labels that should be visible in a one combined group
  */
@@ -47,6 +53,11 @@ LabelGroup LabelFilter::getFilteredLabels(FilteringAlgorithm algorithm)
         return getFilteredLabelsShowMore();
 }
 
+/**
+ * getFilteredLabelsStable function filters the list and returns one filtered out LabelGroup using stable algorithm
+ *
+ * @return all the labels that should be visible in a one combined group
+ */
 LabelGroup LabelFilter::getFilteredLabelsStable()
 {
     //Step 1. We are creating new group (allLabels) that will contain all the labels from all the datasets:
@@ -94,6 +105,12 @@ LabelGroup LabelFilter::getFilteredLabelsStable()
     return allLabels;
 }
 
+
+/**
+ * getFilteredLabelsShowMore function filters the list and returns one filtered out LabelGroup usinf showMore Algorithm
+ *
+ * @return all the labels that should be visible in a one combined group
+ */
 LabelGroup LabelFilter::getFilteredLabelsShowMore()
 {
     //Step 1. We are creating new group (allLabels) that will contain all the labels from all the datasets:
@@ -185,3 +202,6 @@ LabelGroupList LabelFilter::getList()
     return this->list;
 }
 
+}//namespace labelFilter
+}//namespace rebold
+}//namespace pl

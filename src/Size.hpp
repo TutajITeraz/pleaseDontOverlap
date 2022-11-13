@@ -10,8 +10,21 @@
 #ifndef SIZE_HPP
 #define SIZE_HPP
 
+namespace pl
+{
+namespace rebold
+{
+namespace labelFilter
+{
+
+
 struct Size {
     double w, h;
 };
+
+
+}//namespace labelFilter
+}//namespace rebold
+}//namespace pl
 
 #endif // SIZE_HPP

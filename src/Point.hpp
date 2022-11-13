@@ -11,8 +11,21 @@
 #ifndef POINT_HPP
 #define POINT_HPP
 
+namespace pl
+{
+namespace rebold
+{
+namespace labelFilter
+{
+
+
 struct Point {
     double x, y;
 };
+
+
+}//namespace labelFilter
+}//namespace rebold
+}//namespace pl
 
 #endif // POINT_HPP

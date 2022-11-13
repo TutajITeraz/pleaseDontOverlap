@@ -21,6 +21,14 @@
 #include <LabelGroup.hpp>
 #include <LabelGroupList.hpp>
 
+namespace pl
+{
+namespace rebold
+{
+namespace labelFilter
+{
+
+
 class LabelFilter{
     public:
         LabelFilter();
@@ -37,6 +45,11 @@ class LabelFilter{
         LabelGroup          getFilteredLabelsStable();
         LabelGroup          getFilteredLabelsShowMore();
 };
+
+
+}//namespace labelFilter
+}//namespace rebold
+}//namespace pl
 
 
 #endif // LABEL_FILTER_HPP

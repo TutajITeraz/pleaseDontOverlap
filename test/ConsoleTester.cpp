@@ -5,9 +5,9 @@
  * Copyright (C) 2022 Łukasz Bolda < http://rebold.pl/ >
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-
+#include <iostream>
 #include <stdio.h>
-#include <opencv2/opencv.hpp>
+#include <chrono> //for measuring time
 
 #include <Coordinates.hpp>
 #include <Size.hpp>
@@ -17,14 +17,28 @@
 #include <LabelGroupList.hpp>
 #include <LabelFilter.hpp>
 #include <CommonTestFunctions.hpp>
-#include <chrono> //for measuring time
+
+namespace pl
+{
+namespace rebold
+{
+namespace labelFilter
+{
 
 extern int HOW_MANY_LISTS;
 extern int HOW_MANY_LABELS;
 
+}//namespace labelFilter
+}//namespace rebold
+}//namespace pl
+
+
+
+using namespace pl::rebold::labelFilter;
 
 int main(int argc, char** argv )
 {
+    //Parsing arguments. First argument is for numer of lists, and second argument is for number of labels in each list
     LabelGroupList list;
     if(argc == 3)
     {
@@ -32,12 +46,15 @@ int main(int argc, char** argv )
         HOW_MANY_LABELS = std::atoi(argv[2]);
     }
 
+    //Generating random labels:
     std::cout<<"Random generating labels:"<<std::endl;
-    list = generateRadnomLists(Size{24,16}, Size{120,34});
+    list = generateRadnomLists(Size{24,16}, Size{120,34});  //arguments are minimal and maximal label size
+    //Printing all generated labels
     printList(list);
+    //Creating filter
     LabelFilter newLabelFilter(list);
 
-
+    //Filtering and printing names of all selected labels:
     std::cout<<"Selected labels:"<<std::endl;
     LabelGroup selectedLabels = newLabelFilter.getFilteredLabels(stable);
     for(LabelGroup::iterator git = selectedLabels.begin(); git != selectedLabels.end(); ++git){

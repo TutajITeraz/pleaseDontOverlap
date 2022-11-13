@@ -48,9 +48,32 @@ cmake ..
 make
 ```
 
-# Testing environment (visual):
-## Dependences
+# Testing
+## Console tester
 
+Default tester is build by `make` command. To run it with a default settings - 33 labels in 3 datasets (99 labels total). execute command:
+
+```
+ ./build/test/ConsoleTester 
+```
+
+You can also modify the number of labels (second param) and datasets (first param).
+```
+ ./build/test/ConsoleTester [NUMBER_OF_LISTS=3] [NUMBER_OF_LABELS_ON_THE_LIST=33]
+```
+For example if I want to create 4 groups with 25 labels each i have to execute:
+```
+ ./build/test/ConsoleTester 4 25
+```
+
+Tester is printing all the details of random generated datasets, then filtering them and printing names of all the selected ones.
+
+Then speed test is performed : It repeats 1000x both stable and showMore algorithm to calculate average execution time.
+
+## Visual tester
+### Dependences
+
+Visual tester needs to run:
 - opencv ( https://opencv.org/ )
 
 install opencv from repository (https://github.com/opencv/opencv/releases) or you OS package manager e.g.:
@@ -58,11 +81,22 @@ install opencv from repository (https://github.com/opencv/opencv/releases) or yo
 pamac install opencv
 ```
 
-## Testing
+###Compilation of visual tests:
+```
+cd build
+cmake -DWITH_VISUAL_TESTS=1 ..
+make
+```
+
+### Testing
 
 ```
-./test/LabelFilterTest ../test/img/map.png
+cd build
+./test/VisualTester [NUMBER_OF_LISTS=3] [NUMBER_OF_LABELS_ON_THE_LIST=33]
 ```
+
+You can zoom with mouse scroll and pan with left mouse button.
+Press ESC to exit.
 
 
 ## Why I've used sorting algorithm before collision detection?

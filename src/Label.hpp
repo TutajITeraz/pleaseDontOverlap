@@ -16,6 +16,14 @@
 #include <Size.hpp>
 #include <Coordinates.hpp>
 
+namespace pl
+{
+namespace rebold
+{
+namespace labelFilter
+{
+
+
 enum FilteringAlgorithm { stable, showMore };
 
 struct Label {
@@ -40,5 +48,10 @@ struct Label {
     }
 
 };
+
+
+}//namespace labelFilter
+}//namespace rebold
+}//namespace pl
 
 #endif // LABEL_HPP

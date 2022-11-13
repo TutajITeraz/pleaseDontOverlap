@@ -13,6 +13,19 @@
 #include <LabelGroup.hpp>
 #include <list>
 
+namespace pl
+{
+namespace rebold
+{
+namespace labelFilter
+{
+
+
 typedef std::list <LabelGroup> LabelGroupList;
+
+
+}//namespace labelFilter
+}//namespace rebold
+}//namespace pl
 
 #endif // LABEL_GROUP_LIST_HPP

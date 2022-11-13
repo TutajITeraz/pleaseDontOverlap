@@ -11,8 +11,21 @@
 #ifndef COORDINATES_HPP
 #define COORDINATES_HPP
 
+namespace pl
+{
+namespace rebold
+{
+namespace labelFilter
+{
+
+
 struct Coordinates {
     double lon, lat;    //latitude, longitude
 };
+
+
+}//namespace labelFilter
+}//namespace rebold
+}//namespace pl
 
 #endif // COORDINATES_HPP

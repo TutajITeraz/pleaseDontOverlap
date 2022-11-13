@@ -18,6 +18,14 @@
 #include <random>
 #include <sstream>
 
+namespace pl
+{
+namespace rebold
+{
+namespace labelFilter
+{
+
+
 int HOW_MANY_LISTS = 3;
 int HOW_MANY_LABELS = 33;
 
@@ -82,3 +90,7 @@ void printList(LabelGroupList &list)
     }
 }
 
+
+}//namespace labelFilter
+}//namespace rebold
+}//namespace pl
